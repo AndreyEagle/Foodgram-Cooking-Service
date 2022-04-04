@@ -1,7 +1,8 @@
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import exceptions, filters, mixins, status, viewsets
+from rest_framework import (exceptions, filters, generics, mixins, status,
+                            viewsets)
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -50,11 +51,11 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(
         methods=['GET'],
         detail=False,
-        permission_classes=(IsAuthenticated,)
+        permission_classes=(CurrentUserOrAdmin, IsAuthenticated,)
     )
-    def me(self, request):
+    def me(self, request, *args, **kwargs):
         self.get_object = self.get_instance
-        return self.retrieve(request)
+        return self.retrieve(request, *args, **kwargs)
 
     @action(
         methods=['POST'],
@@ -70,25 +71,30 @@ class UserViewSet(viewsets.ModelViewSet):
         self.get_instance().save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(
-        detail=False,
-        methods=['GET'],
-        permission_classes=(IsAuthenticated,),
+
+class SubscriptionsView(generics.ListAPIView):
+    queryset = User.objects.all()
+    pagination_class = UserLimitPagination
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SubsSerializer
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.OrderingFilter,
     )
-    def subscriptions(self, request):
-        subscriber = User.objects.filter(
+
+    def get_queryset(self):
+        return User.objects.filter(
             following__user=self.request.user
-        ).order_by('id')
-        page = self.paginate_queryset(subscriber)
+        ).order_by('-id')
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = SubsSerializer(
-                subscriber, many=True, context={'request': request}
-            )
+            serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = SubsSerializer(
-            subscriber, many=True, context={'request': request}
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class SubscribeViewSet(CreateDestroyModelViewSet):

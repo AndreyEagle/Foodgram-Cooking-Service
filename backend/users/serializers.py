@@ -39,7 +39,6 @@ class UserGetSerializer(UserSerializer):
             'last_name',
             'is_subscribed'
         )
-        lookup_field = 'username'
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
@@ -113,18 +112,20 @@ class SubsSerializer(UserGetSerializer):
         )
 
     def get_recipe(self, obj):
-        request = self.context['request']
+        request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
+        context = {'request': request}
         recipes_limit = request.query_params.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj)
-        if recipes_limit is not None:
-            recipes_limit = int(recipes_limit)
-            queryset = queryset[:recipes_limit]
-        return [RecipeUserSerializer(query).data for query in queryset]
+        if recipes_limit:
+            recipes = obj.recipes.all().order_by('-pub_date')
+            recipes = recipes[:int(recipes_limit)]
+        else:
+            recipes = obj.recipes.all()
+        return RecipeUserSerializer(recipes, many=True, context=context).data
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+        return obj.recipes.count()
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
