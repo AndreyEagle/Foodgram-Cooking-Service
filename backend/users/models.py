@@ -3,15 +3,33 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    email = models.EmailField('email address', unique=True, max_length=254)
-    password = models.CharField('password', max_length=150)
-    first_name = models.CharField('first name', max_length=150)
-    last_name = models.CharField('last name', max_length=150)
+    email = models.EmailField(
+        'Почта',
+        unique=True,
+        max_length=254,
+        help_text='Укажите почту'
+    )
+    password = models.CharField(
+        'Пароль',
+        max_length=150,
+        help_text='Укажите пароль'
+    )
+    first_name = models.CharField(
+        'Имя',
+        max_length=150,
+        help_text='Укажите имя'
+    )
+    last_name = models.CharField(
+        'Фамилия',
+        max_length=150,
+        help_text='Укажите фамилию'
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
 
     class Meta:
+        ordering = ('-id',)
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 

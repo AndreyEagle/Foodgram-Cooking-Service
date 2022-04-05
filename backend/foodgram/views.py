@@ -17,9 +17,11 @@ from foodgram.permissions import CheckingUserIsAuthor
 from foodgram.serializers import (FavoriteSerializer, IngredientSerializer,
                                   RecipeGetSerializer, RecipeSerializer,
                                   ShoppingCartSerializer, TagSerializer)
+from django.conf import settings
 
 DELETE_RECIPE_ERROR = 'Рецепта нет в избранном'
 DELETE_SHOPLIST_ERROR = 'Рецепта нет в покупках'
+CONTENT_TYPE = 'text/plain'
 
 
 class CreateDestroyModelViewSet(mixins.CreateModelMixin,
@@ -52,7 +54,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         filters.OrderingFilter,
     )
     filterset_class = RecipeFilter
-    ordering = ('-pub_date',)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -79,8 +80,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 f'({ingredient["ingredient__measurement_unit"]}) - '
                 f'{ingredient["total"]} \n'
             )
-        shopping = 'shopping_list.txt'
-        response = HttpResponse(shopping_list, content_type='text/plain')
+        shopping = settings.SHOPPING
+        response = HttpResponse(shopping_list, content_type=CONTENT_TYPE)
         response['Content-Disposition'] = (f'attachment;'
                                            f'filename={shopping}')
         return response
@@ -102,7 +103,7 @@ class FavoriteViewSet(CreateDestroyModelViewSet):
             user=self.request.user,
             recipe=recipe
         )
-        if not favorite:
+        if not favorite.exists():
             raise exceptions.ValidationError(DELETE_RECIPE_ERROR)
         favorite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -124,7 +125,7 @@ class ShoppingCartViewSet(CreateDestroyModelViewSet):
             user=self.request.user,
             recipe=recipe
         )
-        if not shopping_list:
+        if not shopping_list.exists():
             raise exceptions.ValidationError(DELETE_SHOPLIST_ERROR)
         shopping_list.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

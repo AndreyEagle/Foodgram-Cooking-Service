@@ -27,7 +27,10 @@ class UserPostSerializer(UserCreateSerializer):
 
 
 class UserGetSerializer(UserSerializer):
-    is_subscribed = serializers.SerializerMethodField(read_only=True)
+    is_subscribed = serializers.SerializerMethodField(
+        method_name='get_is_subscribed',
+        read_only=True
+    )
 
     class Meta:
         model = User
@@ -46,11 +49,10 @@ class UserGetSerializer(UserSerializer):
             return False
         if request.user.is_anonymous:
             return False
-        subs = Subscriptions.objects.filter(
+        return Subscriptions.objects.filter(
             user=request.user,
             author=obj
         ).exists()
-        return subs
 
 
 class UserChangePassSerializer(serializers.Serializer):
@@ -65,8 +67,7 @@ class UserChangePassSerializer(serializers.Serializer):
         is_password_valid = self.context['request'].user.check_password(value)
         if is_password_valid:
             return value
-        else:
-            raise serializers.ValidationError(INVALID_PASSWORD)
+        raise serializers.ValidationError(INVALID_PASSWORD)
 
 
 class RecipeUserSerializer(serializers.ModelSerializer):
@@ -88,8 +89,14 @@ class RecipeUserSerializer(serializers.ModelSerializer):
 
 
 class SubsSerializer(UserGetSerializer):
-    recipe = serializers.SerializerMethodField(read_only=True)
-    recipes_count = serializers.SerializerMethodField(read_only=True)
+    recipe = serializers.SerializerMethodField(
+        method_name='get_recipe',
+        read_only=True
+    )
+    recipes_count = serializers.SerializerMethodField(
+        method_name='get_recipes_count',
+        read_only=True
+    )
 
     class Meta(UserGetSerializer.Meta):
         model = User
@@ -118,7 +125,7 @@ class SubsSerializer(UserGetSerializer):
         context = {'request': request}
         recipes_limit = request.query_params.get('recipes_limit')
         if recipes_limit:
-            recipes = obj.recipes.all().order_by('-pub_date')
+            recipes = obj.recipes.all()
             recipes = recipes[:int(recipes_limit)]
         else:
             recipes = obj.recipes.all()

@@ -1,3 +1,4 @@
+from backend.core import HTTPMethod
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -30,9 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'id'
     filter_backends = (
         DjangoFilterBackend,
-        filters.OrderingFilter,
     )
-    ordering = ('id',)
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -49,7 +48,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return self.request.user
 
     @action(
-        methods=['GET'],
+        methods=(HTTPMethod.GET,),
         detail=False,
         permission_classes=(CurrentUserOrAdmin, IsAuthenticated,)
     )
@@ -58,7 +57,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return self.retrieve(request, *args, **kwargs)
 
     @action(
-        methods=['POST'],
+        methods=(HTTPMethod.POST,),
         detail=False,
         permission_classes=(CurrentUserOrAdmin, IsAuthenticated,),
     )
@@ -85,7 +84,7 @@ class SubscriptionsView(generics.ListAPIView):
     def get_queryset(self):
         return User.objects.filter(
             following__user=self.request.user
-        ).order_by('-id')
+        )
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -114,7 +113,7 @@ class SubscribeViewSet(CreateDestroyModelViewSet):
             user=self.request.user,
             author=author
         )
-        if not subscribe:
+        if not subscribe.exists():
             raise exceptions.ValidationError(UNFOLLOW_ERROR)
         subscribe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
