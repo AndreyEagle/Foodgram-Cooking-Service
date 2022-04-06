@@ -104,11 +104,22 @@ class Ingredient(models.Model):
 
 
 class TagRecipe(models.Model):
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+        verbose_name='Тэг',
+        help_text='Укажите тэг'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт',
+        help_text='Укажите рецепт'
+    )
 
     class Meta:
-        verbose_name = 'Теги рецепта'
+        verbose_name = 'Тег рецепта'
+        verbose_name_plural = 'Теги рецепта'
         constraints = (
             models.UniqueConstraint(
                 fields=('recipe', 'tag'),
@@ -124,12 +135,16 @@ class IngredientsRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredients_recipe'
+        related_name='ingredients_recipe',
+        verbose_name='Ингредиент',
+        help_text='Укажите ингредиент'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='ingredients_recipe'
+        related_name='ingredients_recipe',
+        verbose_name='Рецепт',
+        help_text='Укажите рецепт'
     )
     amount = models.PositiveSmallIntegerField(
         'Количество',
@@ -138,7 +153,7 @@ class IngredientsRecipe(models.Model):
 
     class Meta:
         verbose_name = 'Ингредиент в рецепте'
-        verbose_name_plural = 'Ингридиенты в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецепте'
         constraints = (
             models.UniqueConstraint(
                 fields=('recipe', 'ingredient'),

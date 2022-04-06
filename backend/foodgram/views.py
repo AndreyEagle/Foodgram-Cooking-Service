@@ -80,7 +80,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 f'({ingredient["ingredient__measurement_unit"]}) - '
                 f'{ingredient["total"]} \n'
             )
-        shopping = settings.SHOPPING
+        shopping = settings.SHOPPING_LIST_FILENAME
         response = HttpResponse(shopping_list, content_type=CONTENT_TYPE)
         response['Content-Disposition'] = (f'attachment;'
                                            f'filename={shopping}')
