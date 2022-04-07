@@ -17,7 +17,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '[::1]',
     'testserver',
-    'blackhole.servehttp.com'
+    '178.154.227.37',
+    'foodgram.serveblog.net'
 ]
 
 
