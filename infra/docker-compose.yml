@@ -17,9 +17,7 @@ services:
     env_file:
       - ./.env
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: 93652342/frontend:v.1.0.0
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
