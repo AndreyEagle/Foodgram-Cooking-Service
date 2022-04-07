@@ -200,12 +200,14 @@ class ShoppingList(models.Model):
         on_delete=models.CASCADE,
         related_name='shopping_list',
         verbose_name='Пользователь',
+        help_text='Добавьте пользователя'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='shopping_list',
         verbose_name='Рецепты',
+        help_text='Добавьте рецепт'
     )
 
     class Meta:
