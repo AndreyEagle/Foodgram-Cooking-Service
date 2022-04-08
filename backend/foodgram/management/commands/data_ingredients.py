@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         with open(
-                'data/data_ingredients.csv',
+                'data/ingredients.csv',
                 'r',
                 encoding='UTF-8') as ingredients:
             for row in reader(ingredients):
