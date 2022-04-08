@@ -101,15 +101,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Djoser settings
-
-DJOSER = {
-    'HIDE_USERS': False,
-    'USER_ID_FIELD': 'id',
-    'LOGIN_FIELD': 'email'
-}
-
-
 # Internationalization
 
 LANGUAGE_CODE = 'en-us'
@@ -149,6 +140,20 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
 }
+
+DJOSER = {
+    # 'SERIALIZERS': {
+    #     'user': 'users.serializers.UserGetSerializer',
+    #     'user_create': 'users.serializers.UserPostSerializer',
+    #     'current_user': 'users.serializers.UserGetSerializer',
+    # },
+    # 'PERMISSIONS': {
+    #     'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
+    #     'user_list': ['rest_framework.permissions.AllowAny']
+    # },
+    'HIDE_USERS': False,
+}
+
 
 # Shopping list filename
 SHOPPING_LIST_FILENAME = 'shopping_list.txt'

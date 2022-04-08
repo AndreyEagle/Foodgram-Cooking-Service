@@ -1,8 +1,8 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from users.views import UserViewSet, SubscribeViewSet, SubscriptionsView
-
+from users.views import (SubscribeViewSet, SubscriptionsView,
+                         TokenCreateView, TokenDestroyView, UserViewSet)
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='users')
@@ -13,8 +13,12 @@ router.register(
 )
 
 urlpatterns = [
-    path('users/subscriptions/', SubscriptionsView.as_view()),
+    path(
+        'users/subscriptions/',
+        SubscriptionsView.as_view(),
+        name='subscriptions'
+    ),
     path('', include(router.urls)),
-    path('auth/', include('djoser.urls.authtoken')),
-
+    path('auth/token/login/', TokenCreateView.as_view(), name='login'),
+    path('auth/token/logout/', TokenDestroyView.as_view(), name='logout'),
 ]

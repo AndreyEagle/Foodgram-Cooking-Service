@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 from users.models import User
-from users.serializers import RecipeUserSerializer, UserSerializer
+from users.serializers import RecipeUserSerializer, UserGetSerializer
 
 from foodgram.models import (Favorite, Ingredient, IngredientsRecipe, Recipe,
                              ShoppingList, Tag)
@@ -86,7 +86,7 @@ class IngredientsRecipePostSerializer(serializers.ModelSerializer):
 
 class RecipeGetSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
-    author = UserSerializer()
+    author = UserGetSerializer()
     ingredients = serializers.SerializerMethodField(
         method_name='get_ingredients',
         read_only=True
@@ -149,7 +149,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True,
     )
-    author = UserSerializer(read_only=True)
+    author = UserGetSerializer(read_only=True)
     ingredients = IngredientsRecipePostSerializer(many=True)
     image = Base64ImageField()
 

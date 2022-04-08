@@ -1,6 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
 from django.shortcuts import get_object_or_404
-from djoser.serializers import UserCreateSerializer, UserSerializer
 from foodgram.models import Recipe
 from rest_framework import serializers
 
@@ -12,7 +11,7 @@ ALREADY_FOLLOW = 'Вы уже подписаны!'
 INVALID_PASSWORD = 'Неверный пароль'
 
 
-class UserPostSerializer(UserCreateSerializer):
+class UserPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
@@ -26,7 +25,7 @@ class UserPostSerializer(UserCreateSerializer):
         )
 
 
-class UserGetSerializer(UserSerializer):
+class UserGetSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(
         method_name='get_is_subscribed',
         read_only=True
@@ -53,6 +52,25 @@ class UserGetSerializer(UserSerializer):
             user=request.user,
             author=obj
         ).exists()
+
+
+class TokenSerializer(serializers.Serializer):
+    email = serializers.CharField(
+        max_length=254,
+    )
+    password = serializers.CharField(
+        max_length=150,
+    )
+
+    def validate(self, data):
+        user_check = User.objects.filter(email=data['email']).exists()
+        if user_check:
+            user = User.objects.get(email=data['email'])
+            password_valid = user.check_password(data['password'])
+            if password_valid:
+                return data
+        else:
+            raise serializers.ValidationError(INVALID_EMAIL_OR_PASSWORD)
 
 
 class UserChangePassSerializer(serializers.Serializer):
@@ -89,8 +107,8 @@ class RecipeUserSerializer(serializers.ModelSerializer):
 
 
 class SubsSerializer(UserGetSerializer):
-    recipe = serializers.SerializerMethodField(
-        method_name='get_recipe',
+    recipes = serializers.SerializerMethodField(
+        method_name='get_recipes',
         read_only=True
     )
     recipes_count = serializers.SerializerMethodField(
@@ -107,7 +125,7 @@ class SubsSerializer(UserGetSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
-            'recipe',
+            'recipes',
             'recipes_count'
         )
         read_only_fields = (
@@ -118,7 +136,7 @@ class SubsSerializer(UserGetSerializer):
             'last_name',
         )
 
-    def get_recipe(self, obj):
+    def get_recipes(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False

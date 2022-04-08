@@ -2,8 +2,9 @@ from backend.core import HTTPMethod
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (exceptions, filters, generics, mixins, status,
+from rest_framework import (exceptions, generics, mixins, status, views,
                             viewsets)
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -12,8 +13,8 @@ from users.models import Subscriptions, User
 from users.pagination import UserLimitPagination
 from users.permissions import CurrentUserOrAdmin
 from users.serializers import (SubscribeSerializer, SubsSerializer,
-                               UserChangePassSerializer, UserGetSerializer,
-                               UserPostSerializer)
+                               TokenSerializer, UserChangePassSerializer,
+                               UserGetSerializer, UserPostSerializer)
 
 UNFOLLOW_ERROR = 'Пользователя нет в подписках'
 
@@ -25,6 +26,7 @@ class CreateDestroyModelViewSet(mixins.CreateModelMixin,
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = UserGetSerializer
     permission_classes = (AllowAny,)
     pagination_class = UserLimitPagination
     queryset = User.objects.all()
@@ -72,13 +74,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class SubscriptionsView(generics.ListAPIView):
-    queryset = User.objects.all()
     pagination_class = UserLimitPagination
     permission_classes = (IsAuthenticated,)
     serializer_class = SubsSerializer
     filter_backends = (
         DjangoFilterBackend,
-        filters.OrderingFilter,
     )
 
     def get_queryset(self):
@@ -116,4 +116,28 @@ class SubscribeViewSet(CreateDestroyModelViewSet):
         if not subscribe.exists():
             raise exceptions.ValidationError(UNFOLLOW_ERROR)
         subscribe.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TokenCreateView(generics.CreateAPIView):
+    serializer_class = TokenSerializer
+    permission_classes = (AllowAny,)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(
+            User,
+            email=serializer.validated_data['email'],
+        )
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'auth_token': token.key})
+
+
+class TokenDestroyView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        token = get_object_or_404(Token, user=self.request.user)
+        token.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
