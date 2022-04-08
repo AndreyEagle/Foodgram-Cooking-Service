@@ -69,8 +69,7 @@ class TokenSerializer(serializers.Serializer):
             password_valid = user.check_password(data['password'])
             if password_valid:
                 return data
-        else:
-            raise serializers.ValidationError(INVALID_EMAIL_OR_PASSWORD)
+        raise serializers.ValidationError(INVALID_EMAIL_OR_PASSWORD)
 
 
 class UserChangePassSerializer(serializers.Serializer):
