@@ -1,3 +1,4 @@
+![CI](https://github.com/AndreyEagle/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 ### Foodgram - это сервис, позволяющий пользователям делиться своими рецептами.  Сервис позволяет: 
 - добавлять понравившиеся рецепты в избранное; 
 - подписываться на интересных авторов рецептов;
