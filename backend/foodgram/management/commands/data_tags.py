@@ -7,7 +7,7 @@ from foodgram.models import Tag
 class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
-        with open('data/tags.csv', 'r', encoding='UTF-8') as tags:
+        with open('data/data_tags.csv', 'r', encoding='UTF-8') as tags:
             for row in reader(tags):
                 if len(row) == 3:
                     Tag.objects.get_or_create(
