@@ -18,7 +18,7 @@ ALLOWED_HOSTS = [
     '[::1]',
     'testserver',
     '178.154.227.37',
-    'foodgram.serveblog.net'
+    'foodgram.sytes.net'
 ]
 
 
