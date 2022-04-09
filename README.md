@@ -7,7 +7,7 @@
 ***
 ### Проект доступен по ссылке:
 
-http://foodgram.serveblog.net/
+http://foodgram.sytes.net/
 
 ### Стек технологий:
 ```
