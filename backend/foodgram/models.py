@@ -1,6 +1,10 @@
 
 from django.db import models
 from users.models import User
+from django.core.validators import MinValueValidator
+
+COOKING_TIME_ERROR = 'Время приготовления должно быть больше 0'
+AMOUNT_VALIDATE_ERROR = 'Количество ингредиента должно быть больше 0!'
 
 
 class Tag(models.Model):
@@ -66,7 +70,8 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления',
-        help_text='Укажите время приготовления'
+        help_text='Укажите время приготовления',
+        validators=(MinValueValidator(1, COOKING_TIME_ERROR),),
     )
     pub_date = models.DateTimeField(
         'Дата добавления',
@@ -148,7 +153,8 @@ class IngredientsRecipe(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         'Количество',
-        help_text='Укажите количество ингредиента'
+        help_text='Укажите количество ингредиента',
+        validators=(MinValueValidator(1, AMOUNT_VALIDATE_ERROR),),
     )
 
     class Meta:

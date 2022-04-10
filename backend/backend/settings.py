@@ -141,19 +141,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-DJOSER = {
-    # 'SERIALIZERS': {
-    #     'user': 'users.serializers.UserGetSerializer',
-    #     'user_create': 'users.serializers.UserPostSerializer',
-    #     'current_user': 'users.serializers.UserGetSerializer',
-    # },
-    # 'PERMISSIONS': {
-    #     'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
-    #     'user_list': ['rest_framework.permissions.AllowAny']
-    # },
-    'HIDE_USERS': False,
-}
-
 
 # Shopping list filename
 SHOPPING_LIST_FILENAME = 'shopping_list.txt'

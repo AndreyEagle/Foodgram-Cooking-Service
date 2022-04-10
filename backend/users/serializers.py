@@ -2,7 +2,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.shortcuts import get_object_or_404
 from foodgram.models import Recipe
 from rest_framework import serializers
-
 from users.models import Subscriptions, User
 
 INVALID_EMAIL_OR_PASSWORD = 'Неверные электронная почта или пароль'
@@ -12,6 +11,7 @@ INVALID_PASSWORD = 'Неверный пароль'
 
 
 class UserPostSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=150)
 
     class Meta:
         model = User
@@ -23,6 +23,10 @@ class UserPostSerializer(serializers.ModelSerializer):
             'last_name',
             'password'
         )
+
+    def validate_password(self, value):
+        validate_password(value, self.context['request'].user)
+        return value
 
 
 class UserGetSerializer(serializers.ModelSerializer):
