@@ -182,6 +182,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f'{name_ingredient.name} {AMOUNT_VALIDATE_ERROR}'
                 )
+        return data
 
     def validate_tags(self, data):
         tags = self.initial_data['tags']
