@@ -166,11 +166,22 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
-    def validate_ingredients(self, data):
-        ingredients = self.initial_data['ingredients']
-        if not ingredients:
+    def validate_ingredients(self, ingredients):
+        init_ingredients = self.initial_data['ingredients']
+        if not init_ingredients:
             raise serializers.ValidationError(INGREDIENT_VALIDATE_ERROR)
-        return data
+        ingredients_check = []
+        for ingredient in ingredients:
+            amount = ingredient['amount']
+            name_ingredient = ingredient['id']
+            if name_ingredient in ingredients_check:
+                raise serializers.ValidationError(INGREDIENT_UNIQUE_ERROR)
+            ingredients_check.append(name_ingredient)
+            if int(amount) <= 0:
+                raise serializers.ValidationError(
+                    f'{name_ingredient.name} {AMOUNT_VALIDATE_ERROR}'
+                )
+        return ingredients
 
     def validate_tags(self, data):
         tags = self.initial_data['tags']
@@ -184,17 +195,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         return value
 
     def add_to_ingredients(self, ingredients, recipe):
-        ingredients_check = []
         for ingredient in ingredients:
             amount = ingredient['amount']
             name_ingredient = ingredient['id']
-            if name_ingredient in ingredients_check:
-                raise serializers.ValidationError(INGREDIENT_UNIQUE_ERROR)
-            ingredients_check.append(name_ingredient)
-            if int(amount) <= 0:
-                raise serializers.ValidationError(
-                    f'{name_ingredient.name} : {AMOUNT_VALIDATE_ERROR}'
-                )
             IngredientsRecipe.objects.create(
                 ingredient=name_ingredient,
                 recipe=recipe,
