@@ -57,7 +57,10 @@ class FavoriteAdmin(admin.ModelAdmin):
         'user',
         'recipe',
     )
-    search_fields = ('user__username',)
+    search_fields = (
+        'user__username',
+        'user__email'
+    )
     empty_value_display = '-пусто-'
 
 
@@ -66,7 +69,10 @@ class ShoppingListAdmin(admin.ModelAdmin):
         'user',
         'recipe',
     )
-    search_fields = ('user__username',)
+    search_fields = (
+        'user__username',
+        'user__email'
+    )
     empty_value_display = '-пусто-'
 
 

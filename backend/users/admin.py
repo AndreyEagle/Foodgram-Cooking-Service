@@ -20,7 +20,12 @@ class SubscriptionsAdmin(admin.ModelAdmin):
         'user',
         'author'
     )
-    search_fields = ('user',)
+    search_fields = (
+        'user__username',
+        'user__email',
+        'author__username',
+        'author__email'
+    )
     empty_value_display = '-пусто-'
 
 
