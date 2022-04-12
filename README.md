@@ -14,8 +14,13 @@ http://foodgram.sytes.net/
 Python 3
 Django
 Django REST Framework
+PostgreSQL
+GitHub Actions
 Djoser
-Docker
+Docker(Docker-Compose)
+Nginx
+Gunicorn
+Яндекс.Облако(Ubuntu 20.04)
 ```
 
 ## Запуск проекта:
